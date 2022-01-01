@@ -1,0 +1,45 @@
+version: '3'
+
+services:
+  db:
+    image: postgres:13
+    restart: always
+    ports:
+      - "${DB_EXTERN_PORT}:${DB_PORT}"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: ${DB_SCHEMA}
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    env_file: .env
+    networks:
+      application:
+  
+  application:
+    restart: always
+    user: 1000:1000
+    stdin_open: true
+    build:
+      args: 
+        USER: ${USER}
+      context: .
+    volumes:
+      - type: bind
+        source: .
+        target: /home/$USER/app/passcontrol
+    working_dir: /home/$USER/app/passcontrol
+    env_file: .env
+    command: sh -c "tail -f /dev/null"
+    networks:
+      application:
+
+networks:
+  application:
+    ipam:
+      config:
+        - subnet: 192.168.4.4/24 # this is to work with vpns
+
+volumes:
+  vscodeextensions:
+  db_data:

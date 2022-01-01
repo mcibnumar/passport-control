@@ -1,0 +1,40 @@
+// Rename the folder this file to .devcontainer is in and rename this file to devcontainer.json
+// Change all {NAME} to your username (probably the one you use in ubuntu, it never worked well for me if it was a
+// username that didn't exist in the host computer)
+
+// For format details, see https://aka.ms/devcontainer.json. For config options, see the README at:
+// https://github.com/microsoft/vscode-dev-containers/tree/v0.183.0/containers/docker-existing-docker-compose
+{
+	"name": "Passport Control",
+
+	"dockerComposeFile": [
+		"../docker-compose.yml"
+	],
+
+	"service": "application",
+
+	"workspaceFolder": "/home/{NAME}/app/passcontrol",
+
+	// Set *default* container specific settings.json values on container create.
+	"settings": {},
+
+    // These extensions are recommended by me
+	"extensions": [
+		"joelday.docthis",
+		"dbaeumer.vscode-eslint",
+		"mutantdino.resourcemonitor",
+		"ldd-vs-code.better-package-json",
+		"prisma.prisma"
+	],
+
+	"remoteUser": "{NAME}",
+	
+	// Use 'forwardPorts' to make a list of ports inside the container available locally.
+	"forwardPorts": [12090, 12091, 12092, 12093],
+	
+	// Uncomment the next line if you want to keep your containers running after VS Code shuts down.
+	"shutdownAction": "none",
+	
+	"postCreateCommand": "cd /home/{NAME}/app/passcontrol && cp .bashrc /home/{NAME}/.bashrc && . /home/{NAME}/.bashrc && npm i -g npm && npm i -g yarn" // && yarn install"
+
+}

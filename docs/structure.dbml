@@ -1,0 +1,75 @@
+Table users {
+  id bigint [pk, increment]
+  discordSnowflake string [unique, not null]
+  username string [not null]
+  discriminator smallint [not null]
+  avatar string
+}
+
+Table applicants {
+  id bigint [pk, increment]
+  userId bigint [ref: > users.id]
+  religionId bigint [ref: > religions.id]
+  sectId bigint [ref: > sects.id]
+  
+}
+
+Table moderators {
+  id bigint [pk, increment]
+  userId bigint [ref: > users.id]
+  level smallint
+}
+
+Table religions {
+  id bigint [pk, increment]
+  name string [unique, not null]
+  description string [not null]
+}
+
+Table sects {
+  id bigint [pk, increment]
+  name string [not null]
+  description string [not null]
+  religionId bigint [ref: > religions.id, not null] 
+}
+
+Table approvals {
+  id bigint [pk, increment]
+  userId bigint [ref: > users.id, not null]
+  approvedBy bigint [ref: > moderators.id]
+  approvedOn datetime
+  
+}
+
+Table availabilities {
+  id bigint [pk, increment]
+  moderatorId bigint [ref: > moderators.id]
+  from datetime [not null]
+  to datetime [not null]
+}
+
+Table appointments {
+  id bigint [pk, increment]
+  date datetime [not null]
+  applicantUserId bigint [ref: > users.id, not null]
+  approvalId bigint [ref: > approvals.id, not null]
+  moderatorId bigint [ref: > moderators.id]
+  moderatorUserId bigint [ ref: > users.id]
+}
+
+Table referrals {
+  id bigint [pk, increment]
+  userId bigint [ref: > users.id]
+  invite string [unique, not null]
+  referringUser string
+}
+
+Table referredUsers {
+  id bigint [pk, increment]
+  referralId bigint [ref: > referrals.id]
+  
+}
+
+Table drafts {
+  id bigint [pk, increment]
+}

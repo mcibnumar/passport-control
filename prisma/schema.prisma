@@ -1,0 +1,119 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+    id                      BigInt      @id @default(autoincrement())
+    discordSnowflake        String      @unique
+    username                String
+    discriminator           Int         @db.SmallInt
+    avatar                  String
+
+    isModerator             Boolean     @default(false)
+    moderatorLevel          Int
+
+    isApplicant             Boolean     @default(false)
+
+    referredBy              Referral?   @relation("ReferredBy", fields: [referredById], references: [id])
+    referredById            BigInt?
+    
+    religion                Religion?   @relation(fields: [religionId], references: [id])
+    religionId              BigInt? 
+    
+    sect                    Sect?       @relation(fields: [sectId], references: [id])
+    sectId                  BigInt? 
+    
+    approvedBy              User?       @relation("UsersApproved", fields: [approvedById], references: [id])
+    approvedById            BigInt?
+    
+    approvedOn              DateTime?
+
+    createdAt               DateTime    @default(now())
+    updatedAt               DateTime    @updatedAt
+
+    usersApproved           User[]      @relation("UsersApproved")
+    referrals               Referral[]  @relation("ReferringUser")
+    availabilities          Availability[]  @relation("Availability")
+    applicantAppointment    Appointment[]   @relation("ApplicantAppointment")
+    moderatorAppointment    Appointment[]   @relation("ModeratorAppointment")
+}
+
+model Referral {
+    id                      BigInt      @id @default(autoincrement())
+
+    user                    User        @relation("ReferringUser", fields: [userId], references: [id])
+    userId                  BigInt
+
+    invite                  String
+    isValid                 Boolean     @default(true)
+
+    createdAt               DateTime    @default(now())
+    updatedAt               DateTime    @updatedAt
+
+    referredUsers           User[]      @relation("ReferredBy")
+
+}
+
+model Religion {
+    id                      BigInt      @id @default(autoincrement())
+    name                    String      @unique
+    description             String
+    isApproved              Boolean     @default(false)
+
+    createdAt               DateTime    @default(now())
+    updatedAt               DateTime    @updatedAt
+
+    users                   User[]
+    sects                   Sect[]
+}
+
+model Sect {
+    id                      BigInt      @id @default(autoincrement())
+    name                    String      @unique
+    description             String
+
+    religion                Religion[]  @relation(fields: [religionId], references: [id])
+    religionId              BigInt
+    isApproved              Boolean     @default(false)
+
+    createdAt               DateTime    @default(now())
+    updatedAt               DateTime    @updatedAt
+
+    users                   User[]
+}
+
+model Availability {
+    id                      BigInt      @id @default(autoincrement())
+
+    user                    User        @relation("Availability", fields: [userId], references: [id])
+    userId                  BigInt
+
+    from                    DateTime
+    to                      DateTime
+
+    createdAt               DateTime    @default(now())
+    updatedAt               DateTime    @updatedAt
+}
+
+model Appointment {
+    id                      BigInt      @id @default(autoincrement())
+
+    from                    DateTime
+    to                      DateTime
+
+    applicant               User        @relation("ApplicantAppointment", fields: [applicantId], references: [id])
+    applicantId             BigInt
+    moderator               User        @relation("ModeratorAppointment", fields: [moderatorId], references: [id])
+    moderatorId             BigInt
+
+    createdAt               DateTime    @default(now())
+    updatedAt               DateTime    @updatedAt
+}
